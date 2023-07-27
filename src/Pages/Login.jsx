@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import image from '../assets/home-phones-2x.png'
 import frontImage from '../assets/iphone-with-profile.png'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
@@ -48,7 +49,10 @@ export default function Login() {
 		<>
 			<div className="flex flex-row  w-100 h-100 mt-40 justify-center">
 				<div className="w-[24%] relative">
-					<img className="object-fit w-100 h-100 absolute" src={image}></img>
+					<img
+						className="object-contain w-100 h-100 absolute"
+						src={image}
+					></img>
 					<img
 						className=" object-fit w-[55%] h-[570px] absolute top-8 left-[33%]"
 						src={frontImage}
@@ -98,7 +102,9 @@ export default function Login() {
 							<span className="font-md font-light ">
 								Don t have an account?{' '}
 							</span>
-							<span className="text-blue-500 font-md font-bold">Sign up</span>
+							<Link to={'/Registeration'}>
+								<span className="text-blue-500 font-md font-bold">Sign up</span>
+							</Link>
 						</p>
 					</div>
 					<p className="text-center mt-4">Get the app</p>
