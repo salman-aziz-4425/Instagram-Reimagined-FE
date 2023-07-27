@@ -4,12 +4,21 @@ import { Link } from 'react-router-dom'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
 import Input from '../Components/Input'
 import Paragraph from '../Components/Paragraph'
+import { Authenticate } from '../utils/Authenticate'
+
 export default function Registeration() {
 	const [user, setUser] = useState({
 		PhoneNumber: 0,
 		fullName: '',
 		Username: '',
 		Password: ''
+	})
+
+	const [error, setError] = useState({
+		PhoneNumber: false,
+		fullName: false,
+		Username: false,
+		Password: false
 	})
 
 	const paragraphTexts = [
@@ -31,26 +40,38 @@ export default function Registeration() {
 	const inputInformation = [
 		{
 			name: 'PhoneNumber',
-			placeholder: 'Phone number'
+			placeholder: 'Phone number',
+			type: 'Number',
+			error: error.PhoneNumber
 		},
 		{
 			name: 'fullName',
-			placeholder: 'Full Name'
+			placeholder: 'Full Name',
+			type: 'text',
+			error: error.fullName
 		},
 		{
 			name: 'Username',
-			placeholder: 'Username'
+			placeholder: 'Username',
+			type: 'text',
+			error: error.Username
 		},
 		{
 			name: 'Password',
-			placeholder: 'Full Name'
+			placeholder: 'Full Name',
+			type: 'text',
+			error: error.Password
 		}
 	]
 
-	const onChangeHandler = event => {
+	const onChangeHandler = (event) => {
 		const { name, value } = event.target
-
 		setUser({ ...user, [name]: value })
+	}
+
+	const onSubmitHandler = () => {
+		setError(Authenticate(user))
+		console.log(Authenticate(user))
 	}
 	return (
 		<div className="flex flex-col items-center justify-center mt-6">
@@ -65,23 +86,25 @@ export default function Registeration() {
 					</p>
 				</div>
 
-				<button className="bg-blue-400 text-white w-80 mx-4 py-1 rounded-md my-4">
+				<button className="bg-blue-400 text-white  w-[80%] mx-4 py-1 rounded-md my-4">
 					Log in facebook
 				</button>
 
-				<div className="flex flex-row justify-center items-center w-80">
+				<div className="flex flex-row justify-center items-center  w-[80%]">
 					<div className="border border-gray-300 w-[150px] space-x-4 mr-2"></div>
 					<p className="text-gray-400 space-x-4">OR</p>
 					<div className="border border-gray-300 w-[150px] ml-2"></div>
 				</div>
 
-				<div className="flex flex-col items-center w-full">
+				<div className="flex flex-col items-center w-2/5 justify-center">
 					{inputInformation.map((input, index) => (
 						<Input
 							key={index}
 							placeholder={input.placeholder}
 							name={input.name}
+							type={input.type}
 							onChangeHandler={onChangeHandler}
+							width={80}
 						/>
 					))}
 				</div>
@@ -100,12 +123,15 @@ export default function Registeration() {
 					</p>
 				</div>
 
-				<button className="bg-blue-400 text-white w-80 my-6 py-1 rounded-md">
+				<button
+					className="bg-blue-400 text-white w-[80%] my-6 py-1 rounded-md"
+					onClick={onSubmitHandler}
+				>
 					Sign Up
 				</button>
 			</div>
 			<div className="flex flex-col font-extrabold  border border-gray-300 mt-4 w-1/5">
-				<p className="text-sm font-light ml-[30%] my-4">
+				<p className="text-sm font-light text-center my-4">
 					<span className="font-md font-light ">Don t have an account? </span>
 					<Link to={'/'}>
 						<span className="text-blue-500 font-md font-bold">Login</span>
