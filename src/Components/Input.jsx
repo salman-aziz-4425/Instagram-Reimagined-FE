@@ -6,6 +6,8 @@ export default function Input(props) {
 		<input
 			className="border border-gray-300 outline-none px-4 py-2 mt-2"
 			placeholder={props.placeholder}
+			name={props.name}
+			onChange={props.onChangeHandler}
 		></input>
 	)
 }

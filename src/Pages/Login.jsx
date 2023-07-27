@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React from 'react'
+import React, { useState } from 'react'
 import image from '../assets/home-phones-2x.png'
 import frontImage from '../assets/iphone-with-profile.png'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
@@ -7,6 +7,11 @@ import facebookLogo from '../assets/icons8-facebook-48.png'
 import Paragraph from '../Components/Paragraph'
 import Input from '../Components/Input'
 export default function Login() {
+	const [user, setUser] = useState({
+		PhoneNumber: 0,
+		Password: ''
+	})
+
 	const paragraphTexts = [
 		'Meta',
 		'About',
@@ -22,11 +27,20 @@ export default function Login() {
 		'Contact uploading and non users',
 		'Meta Verified'
 	]
+
+	const onChangeHandler = event => {
+		const { name, value } = event.target
+
+		setUser({ ...user, [name]: value })
+	}
+
 	const inputInformation = [
 		{
+			name: 'PhoneNumber',
 			placeholder: 'Phone number'
 		},
 		{
+			name: 'Password',
 			placeholder: 'Password'
 		}
 	]
@@ -52,7 +66,12 @@ export default function Login() {
 						<div className="flex flex-col w-[300px] ml-[10%]">
 							<div className="mt-10">
 								{inputInformation.map((input, index) => (
-									<Input key={index} placeholder={input.placeholder} />
+									<Input
+										key={index}
+										placeholder={input.placeholder}
+										name={input.name}
+										onChangeHandler={onChangeHandler}
+									/>
 								))}
 							</div>
 
