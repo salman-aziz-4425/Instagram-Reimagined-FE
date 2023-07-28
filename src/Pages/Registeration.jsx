@@ -1,6 +1,7 @@
 //eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
 import Input from '../Components/Input'
 import Paragraph from '../Components/Paragraph'
@@ -8,17 +9,17 @@ import { Authenticate } from '../utils/Authenticate'
 
 export default function Registeration() {
 	const [user, setUser] = useState({
-		PhoneNumber: 0,
+		phoneNumber: 0,
 		fullName: '',
-		Username: '',
-		Password: ''
+		username: '',
+		password: ''
 	})
 
 	const [error, setError] = useState({
-		PhoneNumber: false,
-		fullName: false,
-		Username: false,
-		Password: false
+		phoneNumber: 0,
+		fullName: '',
+		username: '',
+		password: ''
 	})
 
 	const paragraphTexts = [
@@ -39,10 +40,10 @@ export default function Registeration() {
 
 	const inputInformation = [
 		{
-			name: 'PhoneNumber',
+			name: 'phoneNumber',
 			placeholder: 'Phone number',
 			type: 'Number',
-			error: error.PhoneNumber
+			error: error.phoneNumber
 		},
 		{
 			name: 'fullName',
@@ -51,16 +52,16 @@ export default function Registeration() {
 			error: error.fullName
 		},
 		{
-			name: 'Username',
+			name: 'username',
 			placeholder: 'Username',
 			type: 'text',
-			error: error.Username
+			error: error.username
 		},
 		{
-			name: 'Password',
-			placeholder: 'Full Name',
+			name: 'password',
+			placeholder: 'Password',
 			type: 'text',
-			error: error.Password
+			error: error.password
 		}
 	]
 
@@ -69,8 +70,15 @@ export default function Registeration() {
 		setUser({ ...user, [name]: value })
 	}
 
-	const onSubmitHandler = () => {
-		setError(Authenticate(user))
+	const onSubmitHandler = async (event) => {
+		event.preventDefault()
+		try {
+			setError(Authenticate(user))
+			await axios.post('http://localhost:3000/registerUser', user)
+			alert('user registered successfully')
+		} catch (error) {
+			alert(error)
+		}
 		console.log(Authenticate(user))
 	}
 	return (
