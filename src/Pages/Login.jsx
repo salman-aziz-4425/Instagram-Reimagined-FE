@@ -1,18 +1,23 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import axios from 'axios'
 import image from '../assets/home-phones-2x.png'
 import frontImage from '../assets/iphone-with-profile.png'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
 import facebookLogo from '../assets/icons8-facebook-48.png'
 import Paragraph from '../Components/Paragraph'
 import Input from '../Components/Input'
+import { addUserInfo } from '../features/userSlice.js'
 
 export default function Login() {
 	const [user, setUser] = useState({
-		PhoneNumber: 0,
-		Password: ''
+		phoneNumber: 0,
+		password: ''
 	})
+	const navigate = useNavigate()
+	const dispatch = useDispatch()
 
 	const paragraphTexts = [
 		'Meta',
@@ -38,15 +43,32 @@ export default function Login() {
 
 	const inputInformation = [
 		{
-			name: 'PhoneNumber',
+			name: 'phoneNumber',
 			placeholder: 'Phone number'
 		},
 		{
-			name: 'Password',
+			name: 'password',
 			placeholder: 'Password'
 		}
 	]
 
+	const onSubmitHandler = async (event) => {
+		event.preventDefault()
+		try {
+			const userInfo = await axios.get(
+				`http://localhost:3000/loginUser?phoneNumber=${user.phoneNumber}&password=${user.password}`
+			)
+			dispatch(
+				addUserInfo({
+					...userInfo.data
+				})
+			)
+			alert('Login successfully')
+			navigate('/Home')
+		} catch (error) {
+			alert(error)
+		}
+	}
 	return (
 		<>
 			<div className="flex flex-row  w-100 h-100 mt-40 justify-center space-x-4 md:flex w-100 h-100  space-between">
@@ -82,7 +104,10 @@ export default function Login() {
 								))}
 							</div>
 
-							<button className="bg-blue-400 mt-6 rounded-md text-white py-2 w-[91%]">
+							<button
+								className="bg-blue-400 mt-6 rounded-md text-white py-2 w-[91%]"
+								onClick={onSubmitHandler}
+							>
 								{' '}
 								Login
 							</button>
