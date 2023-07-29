@@ -2,5 +2,9 @@
 import React from 'react'
 
 export default function Follower() {
-	return <div>Follower</div>
+	return (
+		<>
+			<h1>hello</h1>
+		</>
+	)
 }

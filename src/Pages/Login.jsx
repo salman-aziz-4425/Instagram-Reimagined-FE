@@ -7,8 +7,8 @@ import image from '../assets/home-phones-2x.png'
 import frontImage from '../assets/iphone-with-profile.png'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
 import facebookLogo from '../assets/icons8-facebook-48.png'
-import Paragraph from '../Components/Paragraph'
-import Input from '../Components/Input'
+import Paragraph from '../Components/UI/Paragraph'
+import Input from '../Components/UI/Input'
 import { addUserInfo } from '../features/userSlice.js'
 
 export default function Login() {
@@ -60,7 +60,8 @@ export default function Login() {
 			)
 			dispatch(
 				addUserInfo({
-					...userInfo.data
+					...userInfo.data,
+					isAuth: true
 				})
 			)
 			alert('Login successfully')
