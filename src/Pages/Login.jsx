@@ -44,11 +44,13 @@ export default function Login() {
 	const inputInformation = [
 		{
 			name: 'phoneNumber',
-			placeholder: 'Phone number'
+			placeholder: 'Phone number',
+			type: 'number'
 		},
 		{
 			name: 'password',
-			placeholder: 'Password'
+			placeholder: 'Password',
+			type: 'text'
 		}
 	]
 
@@ -99,6 +101,7 @@ export default function Login() {
 										key={index}
 										placeholder={input.placeholder}
 										name={input.name}
+										type={input.type}
 										onChangeHandler={onChangeHandler}
 										width={70}
 									/>

@@ -1,7 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import * as React from 'react'
+import axios from 'axios'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
+import { useDispatch } from 'react-redux'
+import { updatePostVisibility } from '../../features/userSlice'
 
 const style = {
 	position: 'absolute',
@@ -22,9 +25,29 @@ export default function Postmanagemodal({
 	open,
 	postId,
 	deletePost,
-	handleUpdateModal
+	handleUpdateModal,
+	privateStatus,
+	setprivatePost
 }) {
-	console.log(postId)
+	const dispatch = useDispatch()
+	const changeVisibility = async () => {
+		try {
+			await axios.put('http://localhost:3000/updateVisibility', {
+				postId: postId,
+				visibility: !privateStatus
+			})
+			dispatch(
+				updatePostVisibility({
+					_id: postId,
+					visibility: !privateStatus
+				})
+			)
+			setprivatePost(!privateStatus)
+			alert('Visibility changes')
+		} catch (error) {
+			alert(error)
+		}
+	}
 	return (
 		<div>
 			<Modal
@@ -45,6 +68,12 @@ export default function Postmanagemodal({
 						onClick={() => handleUpdateModal(true)}
 					>
 						Edit
+					</p>
+					<p
+						className="text-black font-bold text-md border-b border-b-gray-500 cursor-pointer my-4"
+						onClick={changeVisibility}
+					>
+						{privateStatus ? 'Make it public' : 'Make it private'}
 					</p>
 				</Box>
 			</Modal>

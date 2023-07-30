@@ -10,7 +10,9 @@ const initialState = {
 	isAuth: false,
 	token: '',
 	profilePic: '',
-	visibility: false
+	visibility: false,
+	followers: [],
+	following: []
 }
 
 export const userSlice = createSlice({
@@ -27,6 +29,8 @@ export const userSlice = createSlice({
 			state.profilePic = action.payload.user.profilePictureUrl
 			state.isAuth = action.payload.isAuth
 			state.visibility = action.payload.user.visibility
+			state.followers = action.payload.user.followers
+			state.following = action.payload.user.following
 		},
 		addUsersPost: (state, action) => {
 			const posts = state.posts
@@ -40,6 +44,9 @@ export const userSlice = createSlice({
 			})
 			state.posts = posts
 		},
+		addFollowingRequest: (state, action) => {
+			state.following.push(action.payload)
+		},
 		updateUsersPost: (state, action) => {
 			const posts = state.posts
 			const id = action.payload._id
@@ -52,8 +59,17 @@ export const userSlice = createSlice({
 				post.userId.profilePictureUrl = action.payload.imageUrl
 			})
 		},
-		updateVisibilityUser: (state, action) => {
-			state.visibility = action.payload
+		updatePostVisibility: (state, action) => {
+			const posts = state.posts
+			const id = action.payload._id
+			const index = posts?.findIndex((post) => post._id === id)
+			posts[index].privateStatus = action.payload.visibility
+		},
+		acceptFollowerRequest: (state, action) => {
+			const index = state.followers.findIndex(
+				(followingUser) => followingUser.user === action.payload.user
+			)
+			state.followers[index].status = action.payload.status
 		}
 	}
 })
@@ -63,8 +79,10 @@ export const {
 	addUsersPost,
 	deleteUserPost,
 	updateUserPic,
-	updateVisibilityUser,
-	updateUsersPost
+	updateUsersPost,
+	updatePostVisibility,
+	addFollowingRequest,
+	acceptFollowerRequest
 } = userSlice.actions
 
 export default userSlice.reducer
