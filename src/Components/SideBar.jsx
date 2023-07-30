@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
 import List from '@mui/material/List'
@@ -14,9 +14,9 @@ import PostModal from '../Components/post/PostShare'
 import { addUserInfo } from '../features/userSlice'
 import Search from './Search'
 
-export default function SwipeableTemporaryDrawer() {
-	const [open, setOpen] = React.useState(false)
-	const [searchOpen, setsearchOpen] = React.useState(false)
+export default function SideBar() {
+	const [open, setOpen] = useState(false)
+	const [searchOpen, setsearchOpen] = useState(false)
 	const navigate = useNavigate()
 	const user = useSelector((state) => state.persistedReducer)
 	const dispatch = useDispatch()

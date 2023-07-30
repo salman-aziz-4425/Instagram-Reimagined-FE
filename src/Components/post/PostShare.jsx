@@ -6,6 +6,7 @@ import Modal from '@mui/material/Modal'
 import { Button, TextField } from '@mui/material'
 import back from '../../assets/back.png'
 import { addUsersPost, updateUsersPost } from '../../features/userSlice'
+import ImageUploader from '../UI/ImageUploader'
 
 const style = {
 	position: 'absolute',
@@ -132,28 +133,36 @@ export default function PostModal(props) {
 						<Button onClick={props.handleClose}>
 							<img className="w-8 h-8 object-contain" src={back} />
 						</Button>
+						{props.status === 'SideBar' ? (
+							<p className="font-bold">Create new Post</p>
+						) : (
+							<p className="font-bold">Update Post</p>
+						)}
 
-						<p className="font-bold">Create new Post</p>
 						<Button onClick={handleSubmit}>
 							<h1 className="text-blue-500 font-bold">Share</h1>
 						</Button>
 					</div>
 					<div className="flex h-full">
-						<div className="flex-1 border-r border-r-black">
-							{images.length === 0 && (
-								<div className="fles fles-col justify-center items-center">
-									<input type="file" multiple onChange={fileSelectedHandler} />
+						<div className="flex-1 border-r h-full border-r-black align-middle">
+							{images.length === 0 ? (
+								<div className="h-full justify-center items-center align-middle my-[50%]">
+									<ImageUploader
+										handleSubmit={fileSelectedHandler}
+										mode="Post Share"
+									/>
+								</div>
+							) : (
+								<div className="flex h-full w-full overflow-x-auto transition ease-in-out duration-300">
+									{images.map((image, index) => (
+										<img
+											className="w-full h-full object-contain"
+											key={index}
+											src={image}
+										/>
+									))}
 								</div>
 							)}
-							<div className="flex overflow-x-auto transition ease-in-out duration-300">
-								{images.map((image, index) => (
-									<img
-										className="w-full h-full object-contain"
-										key={index}
-										src={image}
-									/>
-								))}
-							</div>
 						</div>
 						<div className="flex-1 flex flex-col items-center pt-6">
 							<div className="flex relative">

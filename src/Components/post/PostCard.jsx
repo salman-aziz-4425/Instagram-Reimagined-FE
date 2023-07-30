@@ -22,6 +22,7 @@ export default function Post(props) {
 					onClick={() => {
 						props.handleOpen(true)
 						props.setPostId(props.id)
+						props.setprivatePost(props.privateStatus)
 					}}
 				>
 					...
@@ -47,8 +48,14 @@ export default function Post(props) {
 						{props.description}
 					</div>
 				</div>
-				<div className="text-sm mb-2 text-gray-400 cursor-pointer font-medium">
-					View all 14 comments
+				<div
+					className="text-sm mb-2 text-gray-400 cursor-pointer font-medium"
+					onClick={() => {
+						props.setPostId(props.id)
+						props.setcommentModal(true)
+					}}
+				>
+					View all {props?.comment?.length} comments
 				</div>
 			</div>
 		</div>
