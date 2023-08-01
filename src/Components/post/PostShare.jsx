@@ -1,13 +1,18 @@
 import * as React from 'react'
-import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import { Button, TextField } from '@mui/material'
 import back from '../../assets/back.png'
-import { addUsersPost, updateUsersPost } from '../../features/userSlice'
+import {
+	addUserStories,
+	addUsersPost,
+	updateUsersPost
+} from '../../features/userSlice'
 import ImageUploader from '../UI/ImageUploader'
-
+import { message } from 'antd'
+import { addPostAPI, updatePostAPI } from '../../api/post'
+import { storyAddAPI } from '../../api/story'
 const style = {
 	position: 'absolute',
 	top: '50%',
@@ -24,6 +29,7 @@ export default function PostModal(props) {
 	const [description, setDescription] = React.useState()
 	const [imageFiles, setImageFiles] = React.useState([])
 	const [images, setImages] = React.useState([])
+	const [messageApi, contextHolder] = message.useMessage()
 
 	const user = useSelector((state) => state.persistedReducer)
 	const dispatch = useDispatch()
@@ -34,7 +40,6 @@ export default function PostModal(props) {
 			const index = user.posts?.findIndex((post) => post._id === props.postId)
 			setImages(user.posts[index]?.imageUrls)
 		} else {
-			console.log(props.status)
 			setImages([])
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -49,71 +54,134 @@ export default function PostModal(props) {
 		setImages(createURL)
 	}
 
-	const handleSubmit = async (event) => {
+	const onPostAdd = async (event) => {
 		event.preventDefault()
-		const formData = new FormData()
 
 		if (description.length === 0) {
-			alert('please fill description')
+			messageApi.open({
+				type: 'error',
+				content: 'Fill the description '
+			})
 			return
 		}
 		if (images.length === 0) {
-			alert('please upload image')
+			messageApi.open({
+				type: 'error',
+				content: 'Please upload image'
+			})
 			return
-		}
-		formData.append('userId', user._id)
-		formData.append('description', description)
-
-		for (let i = 0; i < images.length; i++) {
-			formData.append('images', imageFiles[i])
 		}
 
 		try {
-			let response = null
-			if (props.status === 'SideBar') {
-				response = await axios.post('http://localhost:3000/addPost', formData, {
-					headers: {
-						'Content-Type': 'multipart/form-data'
-					}
+			if (user.posts.length === 10) {
+				messageApi.open({
+					type: 'error',
+					content: 'Story limit exceeded'
 				})
-				dispatch(
-					addUsersPost({
-						_id: response.data?.id,
-						userId: user,
-						imageUrls: images,
-						description: description,
-						comment: []
-					})
-				)
-				alert('post shared successfully')
-			} else {
-				response = await axios.put(
-					'http://localhost:3000/updatePost',
-					{
-						postId: props.postId,
-						description: description
-					},
-					{
-						headers: {
-							'Content-Type': 'multipart/form-data'
-						}
-					}
-				)
-				dispatch(
-					updateUsersPost({
-						_id: props.postId,
-						description: description
-					})
-				)
-				alert('post updated successfully')
+				return
 			}
+			const response = await addPostAPI(user._id, description, imageFiles)
+			dispatch(
+				addUsersPost({
+					_id: response.data?.id,
+					userId: user,
+					imageUrls: images,
+					description: description,
+					comment: [],
+					privateStatus: false
+				})
+			)
+			messageApi.open({
+				type: 'success',
+				content: 'Post shared successfully'
+			})
 		} catch (error) {
-			alert(error.response.data)
+			messageApi.open({
+				type: 'error',
+				content: 'Something went Wrong'
+			})
+		}
+	}
+
+	const onPostUpdate = async (event) => {
+		event.preventDefault()
+		if (description.length === 0) {
+			messageApi.open({
+				type: 'error',
+				content: 'Fill the description '
+			})
+			return
+		}
+		if (images.length === 0) {
+			messageApi.open({
+				type: 'error',
+				content: 'Please upload image'
+			})
+			return
+		}
+		try {
+			await updatePostAPI(props.postId, description)
+			dispatch(
+				updateUsersPost({
+					_id: props.postId,
+					description: description
+				})
+			)
+			messageApi.open({
+				type: 'success',
+				content: 'Post Updated successfully'
+			})
+		} catch (error) {
+			messageApi.open({
+				type: 'error',
+				content: 'Something went Wrong'
+			})
+		}
+	}
+
+	const onStoryAdd = async (event) => {
+		event.preventDefault()
+
+		if (description.length === 0) {
+			messageApi.open({
+				type: 'error',
+				content: 'Fill the description '
+			})
+			return
+		}
+		if (images.length === 0) {
+			messageApi.open({
+				type: 'error',
+				content: 'Please upload image'
+			})
+			return
+		}
+
+		try {
+			const response = await storyAddAPI(user._id, description, imageFiles[0])
+			dispatch(
+				addUserStories({
+					_id: response.data?.id,
+					userId: user,
+					imageUrls: images[0],
+					description: description
+				})
+			)
+			messageApi.open({
+				type: 'success',
+				content: 'Story shared successfully'
+			})
+		} catch (error) {
+			messageApi.open({
+				type: 'error',
+				content: 'Something went Wrong'
+			})
 		}
 	}
 
 	return (
 		<React.Fragment>
+			{contextHolder}
 			<Modal
 				open={props.open}
 				onClose={props.handleClose}
@@ -133,13 +201,26 @@ export default function PostModal(props) {
 						<Button onClick={props.handleClose}>
 							<img className="w-8 h-8 object-contain" src={back} />
 						</Button>
-						{props.status === 'SideBar' ? (
+						{props.status === 'SideBar' && (
 							<p className="font-bold">Create new Post</p>
-						) : (
+						)}
+						{props.status === 'UpdateModal' && (
 							<p className="font-bold">Update Post</p>
 						)}
-
-						<Button onClick={handleSubmit}>
+						{props.status === 'Story' && (
+							<p className="font-bold">Create new Story</p>
+						)}
+						<Button
+							onClick={(e) => {
+								if (props.status === 'SideBar') {
+									onPostAdd(e)
+								} else if (props.status === 'UpdateModal') {
+									onPostUpdate(e)
+								} else {
+									onStoryAdd(e)
+								}
+							}}
+						>
 							<h1 className="text-blue-500 font-bold">Share</h1>
 						</Button>
 					</div>

@@ -1,11 +1,12 @@
 //eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import { message } from 'antd'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
 import Input from '../Components/UI/Input'
 import Paragraph from '../Components/UI/Paragraph'
-import { Authenticate } from '../utils/Authenticate'
+import { authenticate } from '../utils/authenticate'
+import { registerUserAPI } from '../api/user'
 
 export default function Registeration() {
 	const [user, setUser] = useState({
@@ -21,6 +22,8 @@ export default function Registeration() {
 		username: '',
 		password: ''
 	})
+
+	const [messageApi, contextHolder] = message.useMessage()
 
 	const paragraphTexts = [
 		'Meta',
@@ -60,7 +63,7 @@ export default function Registeration() {
 		{
 			name: 'password',
 			placeholder: 'Password',
-			type: 'text',
+			type: 'password',
 			error: error.password
 		}
 	]
@@ -73,16 +76,22 @@ export default function Registeration() {
 	const onSubmitHandler = async (event) => {
 		event.preventDefault()
 		try {
-			setError(Authenticate(user))
-			await axios.post('http://localhost:3000/registerUser', user)
-			alert('user registered successfully')
+			setError(authenticate(user))
+			await registerUserAPI(user)
+			messageApi.open({
+				type: 'success',
+				content: 'User Created Successfully'
+			})
 		} catch (error) {
-			alert(error)
+			messageApi.open({
+				type: 'error',
+				content: 'Creating User failed '
+			})
 		}
-		console.log(Authenticate(user))
 	}
 	return (
 		<div className="flex flex-col items-center justify-center mt-6">
+			{contextHolder}
 			<div className="flex flex-col w-1/5 px-2/3 font-extrabold  border border-gray-300  items-center">
 				<div className="w-60 h-20 mt-6">
 					<img className="w-full h-full object-contain" src={InstaLogo}></img>
