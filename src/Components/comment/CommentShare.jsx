@@ -1,9 +1,17 @@
-import * as React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import Box from '@mui/material/Box'
+import { message } from 'antd'
 import Modal from '@mui/material/Modal'
 import { Button, TextField } from '@mui/material'
 import back from '../../assets/back.png'
+import CommentCard from './CommentCard'
+import {
+	addCommentAPI,
+	deleteCommentAPI,
+	updateCommentAPI,
+	getCommentAPI
+} from '../../api/comment'
 
 const style = {
 	position: 'absolute',
@@ -18,17 +26,122 @@ const style = {
 }
 
 export default function CommentShare(props) {
-	const [images, setImages] = React.useState([])
-	const user = useSelector((state) => state.persistedReducer)
+	const [comments, setcomments] = useState([])
+	const [description, setDescription] = useState('')
+	const [images, setImages] = useState([])
+	const [messageApi, contextHolder] = message.useMessage()
+	const Activeuser = useSelector((state) => state.persistedReducer)
+	useEffect(() => {
+		const fetchdata = async () => {
+			const response = await getCommentAPI(props?.postId)
+			setcomments(response.data?.comments)
+			setImages(response.data?.postImages)
+		}
+		fetchdata()
+	}, [props])
 
-	React.useEffect(() => {
-		const index = user.posts?.findIndex((post) => post._id === props.postId)
-		setImages(user.posts[index]?.imageUrls)
-	}, [props.open, props.postId, user.posts])
+	const onCommentAdd = async (e) => {
+		e.preventDefault()
+		try {
+			if (description.length === 0) {
+				alert('Fields are empty')
+				return
+			}
 
-	const handleSubmit = () => {}
+			await addCommentAPI(Activeuser._id, props.postId, description)
+			const newComment = {
+				_id: props.postId,
+				userId: {
+					profilePictureUrl: Activeuser.profilePic,
+					username: Activeuser.username
+				},
+				description: description
+			}
+			setcomments([newComment, ...comments])
+
+			messageApi.open({
+				type: 'success',
+				content: 'Comments added'
+			})
+
+			const postIndex = props.followingPost.findIndex(
+				(p) => p._id === props.postId
+			)
+			const post = props.followingPost?.find(
+				(post) => post._id === props.postId
+			)
+			const updatedPost = { ...post, comment: [...post.comment, newComment] }
+			const updatedFollowingPost = [
+				...props.followingPost.slice(0, postIndex),
+				updatedPost,
+				...props.followingPost.slice(postIndex + 1)
+			]
+
+			props.setfollowingPost(updatedFollowingPost)
+
+			props.setcommentCount(comments.length)
+		} catch {
+			messageApi.open({
+				type: 'error',
+				content: 'Comments not added'
+			})
+		}
+	}
+
+	const onCommentDelete = async (id) => {
+		try {
+			await deleteCommentAPI(id)
+			setcomments(comments.filter((comment) => comment._id !== id))
+			const updatedFollowingPost = props.followingPost.map((post) => {
+				if (post._id === props.postId) {
+					const updatedComments = post.comment.filter(
+						(commentId) => commentId !== id
+					)
+					return { ...post, comment: updatedComments }
+				}
+				return post
+			})
+			props.setfollowingPost(updatedFollowingPost)
+			messageApi.open({
+				type: 'success',
+				content: 'Comments deleted'
+			})
+		} catch (error) {
+			console.log(error)
+			messageApi.open({
+				type: 'error',
+				content: 'Comments failed to delete'
+			})
+		}
+	}
+	const onCommentUpdate = async (id) => {
+		if (description.length === 0) {
+			alert('Fields are empty')
+			return
+		}
+		try {
+			await updateCommentAPI(id, description)
+			setcomments((prevComments) =>
+				prevComments.map((comment) =>
+					comment._id === id
+						? { ...comment, description: description }
+						: comment
+				)
+			)
+			messageApi.open({
+				type: 'success',
+				content: 'Comments Updated'
+			})
+		} catch (error) {
+			messageApi.open({
+				type: 'error',
+				content: 'Comments Not updated'
+			})
+		}
+	}
 	return (
 		<React.Fragment>
+			{contextHolder}
 			<Modal
 				open={props.open}
 				onClose={props.handleClose}
@@ -50,7 +163,7 @@ export default function CommentShare(props) {
 						</Button>
 
 						<p className="font-bold">Add Comment</p>
-						<Button onClick={handleSubmit}>
+						<Button onClick={onCommentAdd}>
 							<h1 className="text-blue-500 font-bold">Share</h1>
 						</Button>
 					</div>
@@ -73,17 +186,30 @@ export default function CommentShare(props) {
 									id="paragraph-input"
 									label="Enter your Comment"
 									multiline
-									rows={4}
+									rows={10}
 									variant="outlined"
 									fullWidth
+									onChange={(e) => setDescription(e.target.value)}
 								/>
 							</div>
 							<h1 className="font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-purple-500 to-red-600 mt-20 border-y border-gray-500 w-full text-center py-4">
 								Comments
 							</h1>
-							<div className="flex">
-								<img />
-								<p>Salman Aziz</p>
+							<div className="flex flex-col w-full h-full overflow-y-auto">
+								{comments.map((comment) => (
+									<CommentCard
+										key={comment._id}
+										_id={comment._id}
+										Activeuserposts={Activeuser.posts}
+										postId={props.postId}
+										username={comment.userId.username}
+										profile={comment.userId?.profilePictureUrl}
+										description={comment.description}
+										loc={props.loc}
+										deleteCommentHandler={onCommentDelete}
+										updateCommentHandler={onCommentUpdate}
+									/>
+								))}
 							</div>
 						</div>
 					</div>

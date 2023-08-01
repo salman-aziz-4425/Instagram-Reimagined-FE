@@ -1,4 +1,4 @@
-export const Authenticate = (user) => {
+export const authenticate = (user) => {
 	const PhoneNumber = /^[0-9]{10}$/
 	const username = /^[a-zA-Z][a-zA-Z0-9_]{2,19}$/
 

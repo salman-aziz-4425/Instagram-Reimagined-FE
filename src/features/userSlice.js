@@ -12,7 +12,8 @@ const initialState = {
 	profilePic: '',
 	visibility: false,
 	followers: [],
-	following: []
+	following: [],
+	stories: []
 }
 
 export const userSlice = createSlice({
@@ -37,6 +38,22 @@ export const userSlice = createSlice({
 			posts.push(action.payload)
 			state.posts = posts
 		},
+		addUserStories: (state, action) => {
+			const story = state.stories
+			story.push(action.payload)
+			state.stories = story
+		},
+		addFollowingRequest: (state, action) => {
+			state.following.push(action.payload)
+		},
+		addUserComment: (state, action) => {
+			const posts = state.posts
+			const id = action.payload._id
+			const index = posts?.findIndex((post) => post._id === id)
+			if (index !== -1) {
+				posts[index].comment.push(action.payload)
+			}
+		},
 		deleteUserPost: (state, action) => {
 			let posts = state.posts
 			posts = posts.filter((post) => {
@@ -44,14 +61,25 @@ export const userSlice = createSlice({
 			})
 			state.posts = posts
 		},
-		addFollowingRequest: (state, action) => {
-			state.following.push(action.payload)
+		deleteUserComment: (state, action) => {
+			let posts = state.posts
+			console.log(action.payload.postId)
+			posts = posts.filter((post) => {
+				return post._id !== action.payload.postId
+			})
+			console.log(posts)
+			posts.comment = posts.comment.filter((comment) => {
+				return comment._id !== action.payload.commentId
+			})
+			console.log(posts)
 		},
 		updateUsersPost: (state, action) => {
 			const posts = state.posts
 			const id = action.payload._id
 			const index = posts?.findIndex((post) => post._id === id)
-			posts[index].description = action.payload.description
+			if (index !== -1) {
+				posts[index].description = action.payload.description
+			}
 		},
 		updateUserPic: (state, action) => {
 			state.profilePic = action.payload.imageUrl
@@ -63,13 +91,20 @@ export const userSlice = createSlice({
 			const posts = state.posts
 			const id = action.payload._id
 			const index = posts?.findIndex((post) => post._id === id)
-			posts[index].privateStatus = action.payload.visibility
+			if (index !== -1) {
+				posts[index].privateStatus = action.payload.visibility
+			}
+		},
+		updateVisibilityUser: (state, action) => {
+			state.visibility = action.payload
 		},
 		acceptFollowerRequest: (state, action) => {
 			const index = state.followers.findIndex(
 				(followingUser) => followingUser.user === action.payload.user
 			)
-			state.followers[index].status = action.payload.status
+			if (index !== -1) {
+				state.followers[index].status = action.payload.status
+			}
 		}
 	}
 })
@@ -77,10 +112,14 @@ export const userSlice = createSlice({
 export const {
 	addUserInfo,
 	addUsersPost,
+	addUserStories,
+	addUserComment,
 	deleteUserPost,
+	deleteUserComment,
 	updateUserPic,
 	updateUsersPost,
 	updatePostVisibility,
+	updateVisibilityUser,
 	addFollowingRequest,
 	acceptFollowerRequest
 } = userSlice.actions

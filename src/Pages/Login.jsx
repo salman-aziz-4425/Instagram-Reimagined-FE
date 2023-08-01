@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import axios from 'axios'
+import { message } from 'antd'
 import image from '../assets/home-phones-2x.png'
 import frontImage from '../assets/iphone-with-profile.png'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
@@ -10,15 +10,16 @@ import facebookLogo from '../assets/icons8-facebook-48.png'
 import Paragraph from '../Components/UI/Paragraph'
 import Input from '../Components/UI/Input'
 import { addUserInfo } from '../features/userSlice.js'
-
+import { loginUserAPI } from '../api/user'
 export default function Login() {
 	const [user, setUser] = useState({
 		phoneNumber: 0,
 		password: ''
 	})
+
+	const [messageApi, contextHolder] = message.useMessage()
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
-
 	const paragraphTexts = [
 		'Meta',
 		'About',
@@ -50,30 +51,36 @@ export default function Login() {
 		{
 			name: 'password',
 			placeholder: 'Password',
-			type: 'text'
+			type: 'password'
 		}
 	]
 
 	const onSubmitHandler = async (event) => {
 		event.preventDefault()
+		messageApi.open({
+			type: 'success',
+			content: 'Loging in...'
+		})
 		try {
-			const userInfo = await axios.get(
-				`http://localhost:3000/loginUser?phoneNumber=${user.phoneNumber}&password=${user.password}`
-			)
+			const userInfo = await loginUserAPI(user.phoneNumber, user.password)
 			dispatch(
 				addUserInfo({
 					...userInfo.data,
 					isAuth: true
 				})
 			)
-			alert('Login successfully')
+			setTimeout(() => {}, 20000)
 			navigate('/Home')
 		} catch (error) {
-			alert(error)
+			messageApi.open({
+				type: 'error',
+				content: 'Failed to login'
+			})
 		}
 	}
 	return (
 		<>
+			{contextHolder}
 			<div className="flex flex-row  w-100 h-100 mt-40 justify-center space-x-4 md:flex w-100 h-100  space-between">
 				<div className="w-[24%] relative">
 					<img

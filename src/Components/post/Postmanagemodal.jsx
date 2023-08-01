@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import * as React from 'react'
 import axios from 'axios'
+import { message } from 'antd'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import { useDispatch } from 'react-redux'
@@ -25,14 +26,15 @@ export default function Postmanagemodal({
 	open,
 	postId,
 	deletePost,
-	handleUpdateModal,
+	onUpdateModal,
 	privateStatus,
 	setprivatePost
 }) {
 	const dispatch = useDispatch()
+	const [messageApi, contextHolder] = message.useMessage()
 	const changeVisibility = async () => {
 		try {
-			await axios.put('http://localhost:3000/updateVisibility', {
+			await axios.put('http://localhost:3000/updatePostVisibility', {
 				postId: postId,
 				visibility: !privateStatus
 			})
@@ -43,13 +45,20 @@ export default function Postmanagemodal({
 				})
 			)
 			setprivatePost(!privateStatus)
-			alert('Visibility changes')
+			messageApi.open({
+				type: 'success',
+				content: 'Post set to ' + (!privateStatus ? 'public' : 'private')
+			})
 		} catch (error) {
-			alert(error)
+			messageApi.open({
+				type: 'error',
+				content: 'Failed to Set'
+			})
 		}
 	}
 	return (
 		<div>
+			{contextHolder}
 			<Modal
 				open={open}
 				onClose={handleClose}
@@ -65,7 +74,7 @@ export default function Postmanagemodal({
 					</p>
 					<p
 						className="text-black font-bold text-md border-b border-b-gray-500 cursor-pointer my-4"
-						onClick={() => handleUpdateModal(true)}
+						onClick={() => onUpdateModal(true)}
 					>
 						Edit
 					</p>
