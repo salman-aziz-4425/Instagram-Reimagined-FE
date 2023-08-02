@@ -1,10 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import Login from './Pages/Login'
+
+import Login from './pages/Login'
 import './index.css'
-import Registeration from './Pages/Registeration'
-import Home from './Pages/Home'
-import Profile from './Pages/Profile'
+import Registeration from './pages/Registeration'
+import Home from './pages/Home'
+import Profile from './pages/Profile'
 
 function App() {
 	const PrivateRoute = ({ isAuth, children }) => {
@@ -21,7 +22,7 @@ function App() {
 		return <Navigate to="/Home" />
 	}
 
-	const isAuth = useSelector((state) => state.persistedReducer?.isAuth) || false
+	const isAuth = useSelector((state) => state.user.isAuth) || false
 
 	return (
 		<div className="App">
