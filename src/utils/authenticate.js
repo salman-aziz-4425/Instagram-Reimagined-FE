@@ -8,6 +8,7 @@ export const authenticate = (user) => {
 		username: false,
 		password: false
 	}
+
 	if (!PhoneNumber.test(parseInt(user?.phoneNumber))) {
 		error.phoneNumber = true
 	} else if (user?.phoneNumber.length !== 11) {

@@ -10,7 +10,8 @@ import facebookLogo from '../assets/icons8-facebook-48.png'
 import Paragraph from '../Components/UI/Paragraph'
 import Input from '../Components/UI/Input'
 import { addUserInfo } from '../features/userSlice.js'
-import { loginUserAPI } from '../api/user'
+import { loginUserAPI } from '../services/user'
+
 export default function Login() {
 	const [user, setUser] = useState({
 		phoneNumber: 0,
@@ -78,6 +79,7 @@ export default function Login() {
 			})
 		}
 	}
+
 	return (
 		<>
 			{contextHolder}
@@ -88,7 +90,7 @@ export default function Login() {
 						src={image}
 					></img>
 					<img
-						className=" object-fit w-[55%] absolute top-6 left-[33%]"
+						className=" object-fit w-[54%] absolute top-[5%] left-[33.5%]"
 						src={frontImage}
 					></img>
 				</div>

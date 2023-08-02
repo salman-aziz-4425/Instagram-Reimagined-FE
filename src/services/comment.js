@@ -6,7 +6,7 @@ const API_BASE_URL = 'http://localhost:3000'
 
 export const addCommentAPI = async (userId, postId, description) => {
 	try {
-		await axios.post(`${API_BASE_URL}/addComments`, {
+		await axios.post(`${API_BASE_URL}/comment/add`, {
 			userId: userId,
 			postId: postId,
 			description: description
@@ -18,7 +18,7 @@ export const addCommentAPI = async (userId, postId, description) => {
 
 export const deleteCommentAPI = async (commentId) => {
 	try {
-		await axios.delete(`${API_BASE_URL}/deleteComment?commentId=${commentId}`)
+		await axios.delete(`${API_BASE_URL}/comment/delete?commentId=${commentId}`)
 	} catch (error) {
 		throw error
 	}
@@ -26,7 +26,8 @@ export const deleteCommentAPI = async (commentId) => {
 
 export const updateCommentAPI = async (commentId, description) => {
 	try {
-		await axios.put(`${API_BASE_URL}/updateComment?commentId=${commentId}`, {
+		await axios.put(`${API_BASE_URL}/comment/update`, {
+			commentId: commentId,
 			description: description
 		})
 	} catch (error) {
@@ -37,7 +38,7 @@ export const updateCommentAPI = async (commentId, description) => {
 export const getCommentAPI = async (postId) => {
 	try {
 		const response = await axios.get(
-			`${API_BASE_URL}/getcomments?postId=${postId}`
+			`${API_BASE_URL}/comment/get?postId=${postId}`
 		)
 		return response
 	} catch (err) {

@@ -11,7 +11,7 @@ import {
 	deleteCommentAPI,
 	updateCommentAPI,
 	getCommentAPI
-} from '../../api/comment'
+} from '../../services/comment'
 
 const style = {
 	position: 'absolute',
@@ -30,7 +30,8 @@ export default function CommentShare(props) {
 	const [description, setDescription] = useState('')
 	const [images, setImages] = useState([])
 	const [messageApi, contextHolder] = message.useMessage()
-	const Activeuser = useSelector((state) => state.persistedReducer)
+	const Activeuser = useSelector((state) => state)
+
 	useEffect(() => {
 		const fetchdata = async () => {
 			const response = await getCommentAPI(props?.postId)
@@ -78,8 +79,6 @@ export default function CommentShare(props) {
 			]
 
 			props.setfollowingPost(updatedFollowingPost)
-
-			props.setcommentCount(comments.length)
 		} catch {
 			messageApi.open({
 				type: 'error',

@@ -15,13 +15,11 @@ const initialState = {
 	following: [],
 	stories: []
 }
-
 export const userSlice = createSlice({
 	name: 'User',
 	initialState,
 	reducers: {
 		addUserInfo: (state, action) => {
-			console.log(action.payload?.user._id)
 			state._id = action.payload?.user._id
 			state.phoneNumber = action.payload?.user.phoneNumber
 			state.username = action.payload?.user.username
@@ -37,6 +35,7 @@ export const userSlice = createSlice({
 			const posts = state.posts
 			posts.push(action.payload)
 			state.posts = posts
+			return state
 		},
 		addUserStories: (state, action) => {
 			const story = state.stories
@@ -67,11 +66,9 @@ export const userSlice = createSlice({
 			posts = posts.filter((post) => {
 				return post._id !== action.payload.postId
 			})
-			console.log(posts)
 			posts.comment = posts.comment.filter((comment) => {
 				return comment._id !== action.payload.commentId
 			})
-			console.log(posts)
 		},
 		updateUsersPost: (state, action) => {
 			const posts = state.posts

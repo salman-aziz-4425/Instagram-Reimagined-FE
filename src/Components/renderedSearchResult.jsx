@@ -1,4 +1,5 @@
 import userDefaultPic from '../assets/user.png'
+
 export const renderSearchResults = (searchResults, navigate, loginUserid) => {
 	return searchResults.map((user) => (
 		<div

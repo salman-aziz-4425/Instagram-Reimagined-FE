@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import { Button, TextField } from '@mui/material'
+import { message } from 'antd'
 import back from '../../assets/back.png'
 import {
 	addUserStories,
@@ -10,9 +11,8 @@ import {
 	updateUsersPost
 } from '../../features/userSlice'
 import ImageUploader from '../UI/ImageUploader'
-import { message } from 'antd'
-import { addPostAPI, updatePostAPI } from '../../api/post'
-import { storyAddAPI } from '../../api/story'
+import { addPostAPI, updatePostAPI } from '../../services/post'
+import { storyAddAPI } from '../../services/story'
 const style = {
 	position: 'absolute',
 	top: '50%',
@@ -31,12 +31,11 @@ export default function PostModal(props) {
 	const [images, setImages] = React.useState([])
 	const [messageApi, contextHolder] = message.useMessage()
 
-	const user = useSelector((state) => state.persistedReducer)
+	const user = useSelector((state) => state)
 	const dispatch = useDispatch()
 
 	React.useEffect(() => {
 		if (props.status === 'UpdateModal') {
-			console.log('hello')
 			const index = user.posts?.findIndex((post) => post._id === props.postId)
 			setImages(user.posts[index]?.imageUrls)
 		} else {
@@ -73,14 +72,20 @@ export default function PostModal(props) {
 		}
 
 		try {
-			if (user.posts.length === 10) {
+			if (images.length === 10) {
 				messageApi.open({
 					type: 'error',
-					content: 'Story limit exceeded'
+					content: 'Images limit exceeded'
 				})
 				return
 			}
-			const response = await addPostAPI(user._id, description, imageFiles)
+
+			const response = await addPostAPI(
+				user._id,
+				description,
+				imageFiles,
+				user.token
+			)
 			dispatch(
 				addUsersPost({
 					_id: response.data?.id,
@@ -96,6 +101,7 @@ export default function PostModal(props) {
 				content: 'Post shared successfully'
 			})
 		} catch (error) {
+			console.log(error)
 			messageApi.open({
 				type: 'error',
 				content: 'Something went Wrong'
