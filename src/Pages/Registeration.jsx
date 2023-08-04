@@ -3,8 +3,8 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import InstaLogo from '../assets/Instagram_logo.svg.png'
-import Input from '../Components/Input'
-import Paragraph from '../Components/Paragraph'
+import Input from '../Components/UI/Input'
+import Paragraph from '../Components/UI/Paragraph'
 import { Authenticate } from '../utils/Authenticate'
 
 export default function Registeration() {
