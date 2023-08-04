@@ -7,7 +7,11 @@ import Post from './PostCard(Profile)'
 import { deleteUserPost } from '../../features/userSlice'
 import PostShare from './PostShare'
 import CommentShare from '../comment/CommentShare'
-import { deletePostAPI, likePostAPI, fetchPostDataAPI } from '../../api/post'
+import {
+	deletePostAPI,
+	likePostAPI,
+	fetchPostDataAPI
+} from '../../services/post'
 
 export default function Posthandler(props) {
 	const [open, setOpen] = useState(false)
@@ -19,7 +23,7 @@ export default function Posthandler(props) {
 	const [privatePost, setprivatePost] = useState(false)
 
 	const dispatch = useDispatch()
-	const Activeuser = useSelector((state) => state.persistedReducer)
+	const Activeuser = useSelector((state) => state)
 	const [messageApi, contextHolder] = message.useMessage()
 
 	const SearchUser = props.SearchusersData
@@ -58,13 +62,21 @@ export default function Posthandler(props) {
 			})
 		}
 	}
-	const onPostLike = async (id) => {
+	const onPostLike = async (id, likestatus) => {
+		console.log(likestatus)
 		try {
 			await likePostAPI(id, user._id)
-			messageApi.open({
-				type: 'success',
-				content: 'post liked'
-			})
+			if (likestatus) {
+				messageApi.open({
+					type: 'success',
+					content: 'post disliked'
+				})
+			} else {
+				messageApi.open({
+					type: 'success',
+					content: 'post liked'
+				})
+			}
 		} catch {
 			messageApi.open({
 				type: 'error',

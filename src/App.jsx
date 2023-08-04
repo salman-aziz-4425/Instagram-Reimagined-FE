@@ -21,7 +21,7 @@ function App() {
 		return <Navigate to="/Home" />
 	}
 
-	const isAuth = useSelector((state) => state.persistedReducer?.isAuth) || false
+	const isAuth = useSelector((state) => state.isAuth) || false
 
 	return (
 		<div className="App">

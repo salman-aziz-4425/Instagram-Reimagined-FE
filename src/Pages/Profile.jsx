@@ -12,7 +12,7 @@ import {
 	acceptRequestAPI,
 	rejectRequestAPI,
 	updateVisibilityAPI
-} from '../api/user'
+} from '../services/user'
 
 import {
 	addFollowingRequest,
@@ -31,13 +31,17 @@ export default function Profile() {
 
 	const location = useLocation()
 	const dispatch = useDispatch()
-	const LoggedInUser = useSelector((state) => state?.persistedReducer)
+	const LoggedInUser = useSelector((state) => state)
 	const [messageApi, contextHolder] = message.useMessage()
 
 	const user =
 		location?.state?.loc === '/profile'
 			? LoggedInUser
 			: location.state?.Searchuser
+
+	const config = {
+		headers: { Authorization: `Bearer ${LoggedInUser.token}` }
+	}
 
 	const isRequested = useMemo(
 		() =>
@@ -104,7 +108,7 @@ export default function Profile() {
 			return
 		}
 		try {
-			await updateUserPicAPI(user?._id, event.target?.files[0])
+			await updateUserPicAPI(user?._id, event.target?.files[0], config)
 			dispatch(
 				updateUserPic({
 					imageUrl: URL.createObjectURL(event.target?.files[0]),
@@ -126,15 +130,11 @@ export default function Profile() {
 	const handleFollow = async () => {
 		console.log(isFollowed)
 		try {
-			await followRequestAPI(
-				LoggedInUser._id,
-				user._id,
-				isFollowed ? 'accepted' : 'pending'
-			)
+			await followRequestAPI(LoggedInUser._id, user._id, 'pending', config)
 			dispatch(
 				addFollowingRequest({
 					user: user._id,
-					status: isFollowed ? 'accepted' : 'pending'
+					status: 'pending'
 				})
 			)
 
@@ -153,7 +153,7 @@ export default function Profile() {
 
 	const handleFollowAccept = async () => {
 		try {
-			await acceptRequestAPI(LoggedInUser._id, user._id, 'accepted')
+			await acceptRequestAPI(LoggedInUser._id, user._id, 'accepted', config)
 			dispatch(
 				acceptFollowerRequest({
 					user: user._id,
@@ -163,7 +163,7 @@ export default function Profile() {
 			setFollowStatus('Follow back')
 			messageApi.open({
 				type: 'success',
-				content: 'request accepted want to follow back?'
+				content: 'request accepted'
 			})
 		} catch {
 			messageApi.open({
@@ -174,7 +174,7 @@ export default function Profile() {
 	}
 
 	const handleFollowReject = async () => {
-		await rejectRequestAPI(LoggedInUser._id, user._id)
+		await rejectRequestAPI(LoggedInUser._id, user._id, config)
 		dispatch(
 			acceptFollowerRequest({
 				user: user._id,
@@ -186,7 +186,7 @@ export default function Profile() {
 	}
 	const changeVisibility = async () => {
 		try {
-			await updateVisibilityAPI(user._id, !user.visibility)
+			await updateVisibilityAPI(user._id, !user.visibility, config)
 			dispatch(updateVisibilityUser(!user.visibility))
 			messageApi.open({
 				type: 'success',
@@ -213,8 +213,8 @@ export default function Profile() {
 								className="w-20 h-20 md:w-40 md:h-40 object-contain rounded-full border-2 border-pink-600 p-1 "
 								src={
 									(location.state.loc === '/profile'
-										? user.profilePic
-										: user.profilePictureUrl) || userDefaultPic
+										? user?.profilePic
+										: user?.profilePictureUrl) || userDefaultPic
 								}
 								alt="profile"
 							/>

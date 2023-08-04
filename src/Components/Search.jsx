@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import { renderSearchResults } from './renderedSearchResult'
-import { searchUserAPI } from '../api/user'
+import { searchUserAPI } from '../services/user'
+
 const style = {
 	position: 'absolute',
 	top: '50%',
@@ -22,11 +23,14 @@ const style = {
 const Search = (props) => {
 	const [searchResults, setSearchResults] = useState([])
 	const navigate = useNavigate()
-	const LoggedInUser = useSelector((state) => state?.persistedReducer)
+	const LoggedInUser = useSelector((state) => state)
+	const config = {
+		headers: { Authorization: `Bearer ${LoggedInUser.token}` }
+	}
 
 	const handleSearch = async (e) => {
 		try {
-			const response = await searchUserAPI(e.target.value)
+			const response = await searchUserAPI(e.target.value, config)
 			setSearchResults(response.data)
 		} catch (error) {
 			return

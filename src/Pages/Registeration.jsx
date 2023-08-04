@@ -6,7 +6,7 @@ import InstaLogo from '../assets/Instagram_logo.svg.png'
 import Input from '../Components/UI/Input'
 import Paragraph from '../Components/UI/Paragraph'
 import { authenticate } from '../utils/authenticate'
-import { registerUserAPI } from '../api/user'
+import { registerUserAPI } from '../services/user'
 
 export default function Registeration() {
 	const [user, setUser] = useState({

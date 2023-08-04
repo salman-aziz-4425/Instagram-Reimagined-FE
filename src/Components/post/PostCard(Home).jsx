@@ -1,14 +1,19 @@
 // eslint-disable-next-line no-unused-vars
-import React from 'react'
+import React, { useMemo } from 'react'
 import emptyLike from '../../assets/emptyLike.png'
 import filledLike from '../../assets/filledLike.png'
 import userDefaultPic from '../../assets/user.png'
+
 export default function HomePostCard(props) {
-	const like = props?.followingPost
-		.find((post) => post._id === props.id)
-		.likes.includes(props.LogedInuser)
-	const likeLength = props.followingPost.find((post) => post._id === props.id)
-		.likes.length
+	const likeData = useMemo(() => {
+		const post = props?.followingPost.find((post) => post._id === props.id)
+		const likes = post ? post?.likes : []
+		const like = likes?.includes(props?.LogedInuser)
+		return { like, likeLength: likes.length }
+	}, [props.followingPost, props?.id, props.LogedInuser])
+
+	const like = likeData.like
+	const likeLength = likeData.likeLength
 
 	return (
 		<div className="overflow-hidden border  align-middle my-4">
@@ -53,7 +58,7 @@ export default function HomePostCard(props) {
 				</div>
 				<div
 					onClick={() => {
-						props?.likehandler(props?.id)
+						props?.likehandler(props?.id, like)
 						if (like) {
 							const newlikes = props?.likes.filter(
 								(userid) => userid !== props?.LogedInuser

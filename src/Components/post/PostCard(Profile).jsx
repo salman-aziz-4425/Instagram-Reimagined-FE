@@ -60,7 +60,7 @@ export default function Post(props) {
 				</div>
 				<div
 					onClick={() => {
-						likehandler(id)
+						likehandler(id, like)
 						const newLikes = like
 							? post?.likes.filter((userid) => userid !== LogedInuser)
 							: [...post.likes, LogedInuser]

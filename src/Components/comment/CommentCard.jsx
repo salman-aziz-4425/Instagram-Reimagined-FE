@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react'
 import userDefaultPic from '../../assets/user.png'
+
 function CommentCard(props) {
 	return (
 		<div className="flex flex-col items-start px-2 border-b border-gray-400">

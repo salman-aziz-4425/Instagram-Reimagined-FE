@@ -19,7 +19,7 @@ export default function SideBar() {
 	const [searchOpen, setsearchOpen] = useState(false)
 	const [currentModal, setcurrentModal] = useState('')
 	const navigate = useNavigate()
-	const user = useSelector((state) => state.persistedReducer)
+	const user = useSelector((state) => state)
 	const dispatch = useDispatch()
 
 	const handleOpen = () => {
