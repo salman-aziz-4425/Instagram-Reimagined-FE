@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import Box from '@mui/material/Box'
-import axios from 'axios'
 import Modal from '@mui/material/Modal'
-
+import { renderSearchResults } from './renderedSearchResult'
+import { searchUserAPI } from '../api/user'
 const style = {
 	position: 'absolute',
 	top: '50%',
@@ -21,12 +22,11 @@ const style = {
 const Search = (props) => {
 	const [searchResults, setSearchResults] = useState([])
 	const navigate = useNavigate()
+	const LoggedInUser = useSelector((state) => state?.persistedReducer)
 
 	const handleSearch = async (e) => {
 		try {
-			const response = await axios.get(
-				`http://localhost:3000/searchUser?searchTerm=${e.target.value}`
-			)
+			const response = await searchUserAPI(e.target.value)
 			setSearchResults(response.data)
 		} catch (error) {
 			return
@@ -51,31 +51,11 @@ const Search = (props) => {
 						<input
 							className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
 							placeholder="Search"
-							onChange={(e) => handleSearch(e)}
+							onChange={handleSearch}
 						/>
 					</div>
 					<div className="mt-4">
-						{searchResults.map((user) => (
-							<div
-								key={user._id}
-								className="flex items-center mb-2 cursor-pointer"
-								onClick={() =>
-									navigate('/profile', {
-										state: { Searchuser: user, loc: '/search' }
-									})
-								}
-							>
-								<img
-									src={
-										user.profilePictureUrl ||
-										'https://avatars0.githubusercontent.com/u/38799309?v=4'
-									}
-									alt="User Profile"
-									className="w-10 h-10 rounded-full mr-3"
-								/>
-								<span className="text-lg">{user.username}</span>
-							</div>
-						))}
+						{renderSearchResults(searchResults, navigate, LoggedInUser._id)}
 					</div>
 				</Box>
 			</Modal>

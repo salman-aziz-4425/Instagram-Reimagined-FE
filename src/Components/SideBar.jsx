@@ -17,6 +17,7 @@ import Search from './Search'
 export default function SideBar() {
 	const [open, setOpen] = useState(false)
 	const [searchOpen, setsearchOpen] = useState(false)
+	const [currentModal, setcurrentModal] = useState('')
 	const navigate = useNavigate()
 	const user = useSelector((state) => state.persistedReducer)
 	const dispatch = useDispatch()
@@ -35,11 +36,22 @@ export default function SideBar() {
 		setsearchOpen(false)
 	}
 
-	const ListItems = [
+	const renderNavListItems = [
 		{
 			Icons: addLogo,
 			title: 'Create',
-			onClick: handleOpen
+			onClick: () => {
+				setcurrentModal('SideBar')
+				handleOpen()
+			}
+		},
+		{
+			Icons: addLogo,
+			title: 'Stories',
+			onClick: () => {
+				setcurrentModal('Story')
+				handleOpen()
+			}
 		},
 		{
 			Icons: profilePic,
@@ -80,7 +92,7 @@ export default function SideBar() {
 			}
 		}
 	]
-	const list = (anchor) => (
+	const navlist = (anchor) => (
 		<Box
 			sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 320 }}
 			role="presentation"
@@ -91,7 +103,7 @@ export default function SideBar() {
 				</Link>
 			</div>
 			<List className="flex flex-col justify-center">
-				{ListItems.map((text) => (
+				{renderNavListItems.map((text) => (
 					<div
 						key={text.title}
 						className="flex px-2 items-center hover:bg-gray-300 transition ease-in-out rounded-md duration-300 mx-4 my-4"
@@ -110,13 +122,13 @@ export default function SideBar() {
 	return (
 		<div>
 			<React.Fragment key="left">
-				<Drawer variant="permanent">{list('left')}</Drawer>
+				<Drawer variant="permanent">{navlist('left')}</Drawer>
 			</React.Fragment>
 			<PostModal
 				open={open}
 				handleOpen={handleOpen}
 				handleClose={handleClose}
-				status="SideBar"
+				status={currentModal}
 			/>
 			<Search
 				open={searchOpen}
