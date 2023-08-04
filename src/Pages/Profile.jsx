@@ -1,60 +1,156 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import axios from 'axios'
-import SideBar from '../Components/SideBar'
 import { useDispatch, useSelector } from 'react-redux'
-import Posthandler from '../Components/post/Posthandler'
-import { updateUserPic, updateVisibilityUser } from '../features/userSlice'
-import { Button } from '@mui/material'
 import { useLocation } from 'react-router-dom'
+import SideBar from '../Components/SideBar'
+import Posthandler from '../Components/post/Posthandler'
+import {
+	addFollowingRequest,
+	updateUserPic,
+	acceptFollowerRequest
+} from '../features/userSlice'
+import ImageUploader from '../Components/UI/ImageUploader'
 
 export default function Profile() {
-	const location = useLocation()
-	const userData = useSelector((state) => state.persistedReducer)
-	let user = []
-	if (location.state.loc === '/profile') {
-		user = userData
-	} else {
-		user = location.state.Searchuser
-	}
+	const [followStatus, setFollowStatus] = useState('Follow')
+	const [followersCount, setfollowersCount] = useState(0)
+	const [followingCount, setfollowingCount] = useState(0)
 
-	console.log(location)
+	const location = useLocation()
 	const dispatch = useDispatch()
+	const LoggedInUser = useSelector((state) => state?.persistedReducer)
+
+	const user =
+		location?.state?.loc === '/profile'
+			? LoggedInUser
+			: location.state?.Searchuser
+
+	const isRequested = useMemo(
+		() =>
+			LoggedInUser.followers.find((follow) => follow?.user === user?._id)
+				?.status === 'pending',
+		[LoggedInUser.followers, user?._id]
+	)
+
+	const isAccepted = useMemo(
+		() =>
+			LoggedInUser.followers.find((follow) => follow?.user === user?._id)
+				?.status === 'accepted',
+		[LoggedInUser.followers, user?._id]
+	)
+
+	const isFollowed = useMemo(
+		() =>
+			LoggedInUser.followers.some((follow) => follow?.user === user?._id) &&
+			!LoggedInUser.following.some(
+				(followingUser) => followingUser?.user === user?._id
+			),
+		[LoggedInUser.followers, LoggedInUser.following, user?._id]
+	)
+
+	React.useEffect(() => {
+		if (LoggedInUser._id !== user._id) {
+			const isRequested = LoggedInUser?.following.find(
+				(search) => search.user === user?._id
+			)
+			if (isRequested) {
+				setFollowStatus(isRequested?.status)
+			}
+		}
+		if (location.state.loc === '/profile') {
+			console.log(LoggedInUser.followers)
+			setfollowersCount(
+				LoggedInUser.followers.filter((user) => user.status === 'accepted')
+					.length
+			)
+			setfollowingCount(
+				LoggedInUser.following.filter((user) => user.status === 'accepted')
+					.length
+			)
+		} else if (location.state.loc === '/search') {
+			setfollowersCount(
+				user.followers.filter((user) => user.status === 'accepted').length
+			)
+			setfollowingCount(
+				user.following.filter((user) => user.status === 'accepted').length
+			)
+		}
+	}, [LoggedInUser, location.state.loc, user])
 
 	const handleSubmit = async (event) => {
 		event.preventDefault()
-		if (event.target.files.length === 0) {
+		if (event.target?.files.length === 0) {
 			return
 		}
 
 		const formData = new FormData()
-		formData.append('userId', user._id)
-		formData.append('image', event.target.files[0])
+		formData.append('userId', user?._id)
+		formData.append('image', event.target?.files[0])
 		try {
 			await axios.put('http://localhost:3000/updateProfile', formData)
 			dispatch(
 				updateUserPic({
-					imageUrl: URL.createObjectURL(event.target.files[0]),
-					_id: user._id
+					imageUrl: URL.createObjectURL(event.target?.files[0]),
+					_id: user?._id
 				})
 			)
 			alert('Profile pic updated')
 		} catch (error) {
-			alert(error.message)
+			alert(error?.message)
 		}
 	}
 
-	const changeVisibility = async () => {
+	const handleFollow = async () => {
+		console.log(isFollowed)
 		try {
-			await axios.put('http://localhost:3000/updateVisibility', {
-				userId: user._id,
-				visibility: !user.visibility
+			await axios.post('http://localhost:3000/followRequest', {
+				senderId: LoggedInUser._id,
+				receiverId: user._id,
+				status: isFollowed ? 'accepted' : 'pending'
 			})
-			dispatch(updateVisibilityUser(!user.visibility))
-			alert('Visibility changes')
-		} catch {
-			alert('Something went wrong')
+			dispatch(
+				addFollowingRequest({
+					user: user._id,
+					status: isFollowed ? 'accepted' : 'pending'
+				})
+			)
+			isFollowed ? alert('Followed back') : alert('request sended')
+			setFollowStatus('accepted')
+		} catch (error) {
+			alert('Error sending follow request')
 		}
+	}
+
+	const handleFollowAccept = async () => {
+		await axios.put('http://localhost:3000/acceptRequest', {
+			LogedInUserId: LoggedInUser._id,
+			requestedUserID: user._id,
+			status: 'accepted'
+		})
+		dispatch(
+			acceptFollowerRequest({
+				user: user._id,
+				status: 'accepted'
+			})
+		)
+		setFollowStatus('Follow back')
+		alert('request accepted want to follow back?')
+	}
+
+	const handleFollowReject = async () => {
+		await axios.put('http://localhost:3000/rejectRequest', {
+			LogedInUserId: LoggedInUser._id,
+			requestedUserID: user._id
+		})
+		dispatch(
+			acceptFollowerRequest({
+				user: user._id,
+				status: 'rejected'
+			})
+		)
+		setFollowStatus('Follow')
+		alert('request rejected')
 	}
 
 	return (
@@ -76,31 +172,10 @@ export default function Profile() {
 								alt="profile"
 							/>
 							<br></br>
-							{userData._id === location.state.Searchuser._id && (
-								<input
-									type="file"
-									onChange={(e) => {
-										handleSubmit(e)
-									}}
-								></input>
-							)}
-							{userData._id === location.state.Searchuser._id && (
-								<Button
-									className="bg-blue-600 text-white p-4 rounded-sm mt-10"
-									title="Change Visibility"
-									onClick={changeVisibility}
-								>
-									{user.visibility ? (
-										<p>make it public</p>
-									) : (
-										<p>Make it private</p>
-									)}
-								</Button>
-							)}
 						</div>
 
 						<div className="w-8/12 md:w-7/12 ml-4">
-							<div className="md:flex md:flex-wrap md:items-center mb-4">
+							<div className="md:flex md:flex-row md:items-center mb-4">
 								<h2 className="text-3xl inline-block font-light md:mr-2 mb-2 sm:mb-0">
 									{user.username}
 								</h2>
@@ -111,13 +186,53 @@ export default function Profile() {
 								>
 									<i className="fas fa-check text-white text-xs absolute inset-x-0 ml-1 mt-px"></i>
 								</span>
-								{userData._id !== location.state.Searchuser._id && (
-									<p
-										href="#"
-										className="bg-blue-500 px-2 py-1 text-white font-semibold text-sm rounded  text-center sm:inline-block block cursor-pointer"
-									>
-										Follow
-									</p>
+								{LoggedInUser._id === location.state?.Searchuser._id && (
+									<ImageUploader handleSubmit={handleSubmit} mode="profile" />
+								)}
+								{LoggedInUser._id !== location.state?.Searchuser?._id && (
+									<>
+										{isRequested ? (
+											<div className="flex w-full">
+												<p
+													className="bg-blue-500 px-2 py-1 text-white font-semibold text-sm rounded  text-center sm:inline-block block cursor-pointer"
+													onClick={handleFollowAccept}
+												>
+													Accept
+												</p>
+												<p
+													className="bg-blue-500 px-2 py-1 text-white font-semibold text-sm rounded  text-center sm:inline-block block cursor-pointer ml-4"
+													onClick={handleFollowReject}
+												>
+													Reject
+												</p>
+											</div>
+										) : (
+											<p
+												className="bg-blue-500 px-2 py-1 text-white font-semibold text-sm rounded text-center sm:inline-block block cursor-pointer"
+												onClick={
+													followStatus !== 'pending' &&
+													followStatus !== 'accepted' &&
+													handleFollow
+												}
+											>
+												{followStatus === 'pending' && 'Pending'}
+												{isAccepted === true &&
+													isFollowed === false &&
+													followStatus !== 'pending' &&
+													'Accepted'}
+												{isFollowed === true && 'Follow back'}
+												{followStatus === 'Follow' &&
+													isFollowed === false &&
+													'Follow'}
+												{isFollowed === false &&
+													isAccepted === false &&
+													isRequested === false &&
+													followStatus !== 'Follow' &&
+													followStatus !== 'pending' &&
+													'Accepted'}
+											</p>
+										)}
+									</>
 								)}
 							</div>
 
@@ -127,10 +242,12 @@ export default function Profile() {
 									posts
 								</li>
 								<li>
-									<span className="font-semibold">0</span> followers
+									<span className="font-semibold">{followersCount}</span>{' '}
+									followers
 								</li>
 								<li>
-									<span className="font-semibold">0</span> following
+									<span className="font-semibold">{followingCount}</span>{' '}
+									following
 								</li>
 							</ul>
 						</div>
@@ -145,12 +262,14 @@ export default function Profile() {
 								posts
 							</li>
 							<li>
-								<span className="font-semibold text-gray-800 block">50.5k</span>
+								<span className="font-semibold text-gray-800 block">
+									{followersCount}
+								</span>
 								followers
 							</li>
 							<li>
 								<span className="font-semibold text-gray-800 block">10</span>
-								following
+								{followingCount}
 							</li>
 						</ul>
 						<br />
@@ -164,7 +283,13 @@ export default function Profile() {
 								</a>
 							</li>
 						</ul>
-						{<Posthandler usersData={user} />}
+						{
+							<Posthandler
+								SearchusersData={user}
+								loginUserid={LoggedInUser._id}
+								path={location.state.loc}
+							/>
+						}
 					</div>
 				</div>
 			</main>

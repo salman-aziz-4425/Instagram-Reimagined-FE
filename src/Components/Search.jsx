@@ -29,7 +29,7 @@ const Search = (props) => {
 			)
 			setSearchResults(response.data)
 		} catch (error) {
-			alert('empty field')
+			return
 		}
 	}
 
@@ -66,7 +66,10 @@ const Search = (props) => {
 								}
 							>
 								<img
-									src={user.profilePictureUrl}
+									src={
+										user.profilePictureUrl ||
+										'https://avatars0.githubusercontent.com/u/38799309?v=4'
+									}
 									alt="User Profile"
 									className="w-10 h-10 rounded-full mr-3"
 								/>
