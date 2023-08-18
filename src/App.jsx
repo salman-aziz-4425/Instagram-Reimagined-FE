@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-
 import Login from './pages/Login'
 import './index.css'
 import Registeration from './pages/Registeration'

@@ -1,4 +1,5 @@
 export const authenticate = (user) => {
+
 	const username = /^[a-zA-Z][a-zA-Z0-9_]{2,19}$/
 
 	const error = {
