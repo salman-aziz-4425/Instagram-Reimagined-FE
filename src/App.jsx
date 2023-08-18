@@ -21,8 +21,8 @@ function App() {
 		}
 		return <Navigate to="/Home" />
 	}
-
 	const isAuth = useSelector((state) => state.user.isAuth) || false
+
 
 	return (
 		<div className="App">
