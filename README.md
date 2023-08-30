@@ -73,3 +73,10 @@ You can play with these demo projects in your browser, without installing anythi
 ### Read the documentation
 
 Read [the documentation of vite-plugin-react-pages](https://vitejs.github.io/vite-plugin-react-pages/).
+Demo:
+![Screenshot from 2023-08-31 03-30-10](https://github.com/salman-aziz-4425/Training_proj_FE-Instagram/assets/85288719/9b38291a-4cdd-48d4-b309-3be45ad3c53e)
+![Screenshot from 2023-08-31 03-32-16](https://github.com/salman-aziz-4425/Training_proj_FE-Instagram/assets/85288719/6d181172-8cf4-464d-b87e-f61a37ec6a8b)
+![Screenshot from 2023-08-31 03-30-43](https://github.com/salman-aziz-4425/Training_proj_FE-Instagram/assets/85288719/879bd5ec-75bd-4965-ba44-1c9fe1e7e43d)
+
+
+
