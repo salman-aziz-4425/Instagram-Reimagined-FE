@@ -1,9 +1,5 @@
-# Instagram MERN
-Full-Stack Instgram Clone using MERN Stack and Socket.io
+# Introduction
 
-[Visit Now](https://instagramernstack.herokuapp.com/) 🚀
-
-## 🖥️ Tech Stack
 **Frontend:**
 
 ![reactjs](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)&nbsp;
