@@ -116,7 +116,7 @@ export default function Home() {
 						<PageLoading />
 					) : (
 						<div className="flex-1 flex flex-col ml-80 w-[50%]">
-							{followingPost.length > 0 ? (
+							{followingPost&&followingPost.length > 0 ? (
 								followingPost.map(
 									(post) =>
 										(post.privateStatus === false ||
