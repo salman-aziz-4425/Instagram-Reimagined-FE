@@ -203,7 +203,7 @@ export default function Login() {
 			<div className="flex ml-[45%] mt-8">
 				<p className="text-gray-500 mr-4 text-sm">English</p>
 				<p className="text-gray-500 mr-4 text-sm">
-					© 2023 Instagram from Meta
+					© 2024 Instagram from Meta
 				</p>
 			</div>
 		</>
