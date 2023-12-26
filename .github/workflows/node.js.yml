@@ -46,4 +46,5 @@ jobs:
       - name: Deploy with Docker
         run: |
           sudo docker pull salman4425/instagram-frontend-fe:v1.0
-          sudo docker run -d -p 3000:3001 --name salman4425/instagram-frontend-fe:v1.0
+          sudo docker run -d -p 3000:3001 --name instagram-frontend-fe-v1.0 salman4425/instagram-frontend-fe:v1.0
+
