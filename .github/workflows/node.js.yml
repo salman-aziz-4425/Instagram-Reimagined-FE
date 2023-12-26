@@ -25,9 +25,7 @@ jobs:
       - name: Install Dependencies
         run: |
           npm ci
-          nohup npm run dev &
-          sleep 5
-
+          
   # docker-build:
   #   runs-on: self-hosted
   #   needs: build
