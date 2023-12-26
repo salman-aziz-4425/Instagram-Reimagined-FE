@@ -23,26 +23,28 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci
-
-  docker-build:
-    runs-on: self-hosted
-    needs: build
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Build Docker Image
         run: |
-          sudo docker build -t instagram-reimaged-fe:latest .
-          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          sudo docker push salman4425/instagram-frontend-fe:instagram-reimaged-fe:latest
+          npm ci
+          nohup npm run dev
 
-  deploy:
-    runs-on: self-hosted
-    needs: docker-build
-    steps:
-      - name: Deploy with Docker
-        run: |
-          sudo docker pull instagram-reimaged-fe:latest
-          sudo docker run -d -p 3000:3001 --name instagram-reimaged-fe:latest
+  # docker-build:
+  #   runs-on: self-hosted
+  #   needs: build
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+
+  #     - name: Build Docker Image
+  #       run: |
+  #         sudo docker build -t instagram-reimaged-fe:latest .
+  #         sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+  #         sudo docker push salman4425/instagram-frontend-fe:instagram-reimaged-fe:latest
+
+  # deploy:
+  #   runs-on: self-hosted
+  #   needs: docker-build
+  #   steps:
+  #     - name: Deploy with Docker
+  #       run: |
+  #         sudo docker pull instagram-reimaged-fe:latest
+  #         sudo docker run -d -p 3000:3001 --name instagram-reimaged-fe:latest
