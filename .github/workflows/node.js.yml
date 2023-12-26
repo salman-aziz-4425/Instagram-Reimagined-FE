@@ -34,9 +34,9 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t instagram-reimaged-fe:latest .
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push salman4425/instagram-frontend-fe:instagram-reimaged-fe:latest
+          sudo docker build -t instagram-reimaged-fe:latest .
+          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          sudo docker push salman4425/instagram-frontend-fe:instagram-reimaged-fe:latest
 
   deploy:
     runs-on: self-hosted
@@ -44,5 +44,5 @@ jobs:
     steps:
       - name: Deploy with Docker
         run: |
-          docker pull instagram-reimaged-fe:latest
-          docker run -d -p 3000:3001 --name instagram-reimaged-fe:latest
+          sudo docker pull instagram-reimaged-fe:latest
+          sudo docker run -d -p 3000:3001 --name instagram-reimaged-fe:latest
